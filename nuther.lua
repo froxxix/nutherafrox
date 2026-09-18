@@ -1,18 +1,3 @@
---==================================================
--- NUTHERAFROX UI LIBRARY
---==================================================
--- Premium single file Roblox UI library.
--- Black & white visual identity | PC + Mobile.
--- Author: NUTHERAFROX
--- Date: 26.09.2025
---
--- Legacy API : Library.CreateLib("NUTHERAFROX", "DarkTheme")
--- Modern API : Library:CreateWindow({ Title = "NUTHERAFROX" })
---==================================================
-
---==================================================
--- SERVICES
---==================================================
 
 local CloneRef = (typeof(cloneref) == "function") and cloneref or function(object)
 	return object
@@ -6922,7 +6907,7 @@ local function BuildCreditsTab(window)
 
 	credits:AddParagraph({
 		Title = "NUTHERAFROX UI",
-		Content = "Created by NUTHERAFROX — 26.09.2025",
+		Content = "Created by NUTHERAFROX — 18.09.2026",
 	})
 
 	credits:AddParagraph({
