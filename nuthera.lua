@@ -1,4 +1,2973 @@
 --==================================================
+-- NUTHERAFROX UI LIBRARY
+--==================================================
+-- Premium single file Roblox UI library.
+-- Black & white visual identity | PC + Mobile.
+-- Author: NUTHERAFROX
+-- Date: 26.09.2025
+--
+-- Legacy API : Library.CreateLib("NUTHERAFROX", "DarkTheme")
+-- Modern API : Library:CreateWindow({ Title = "NUTHERAFROX" })
+--==================================================
+
+--==================================================
+-- SERVICES
+--==================================================
+
+local CloneRef = (typeof(cloneref) == "function") and cloneref or function(object)
+	return object
+end
+
+local Players          = CloneRef(game:GetService("Players"))
+local TweenService     = CloneRef(game:GetService("TweenService"))
+local UserInputService = CloneRef(game:GetService("UserInputService"))
+local RunService       = CloneRef(game:GetService("RunService"))
+local HttpService      = CloneRef(game:GetService("HttpService"))
+local CoreGui          = CloneRef(game:GetService("CoreGui"))
+local GuiService       = CloneRef(game:GetService("GuiService"))
+
+local LocalPlayer = Players.LocalPlayer
+
+--==================================================
+-- CONSTANTS
+--==================================================
+
+local LIB_NAME       = "NUTHERAFROX UI Library"
+local LIB_VERSION    = "1.0.0"
+local GUI_NAME       = "NUTHERAFROX_UI_LIBRARY"
+local ROOT_FOLDER    = "NUTHERAFROX"
+local CONFIG_FOLDER  = "NUTHERAFROX/configs"
+local INTERFACE_FILE = "NUTHERAFROX/interface.json"
+
+local YOUTUBE_URL = ""
+local DISCORD_URL = ""
+
+local function SafeFont(name, fallback)
+	local ok, font = pcall(function()
+		return Enum.Font[name]
+	end)
+	if ok and font then
+		return font
+	end
+	return fallback
+end
+
+local FONT        = SafeFont("Gotham", Enum.Font.SourceSans)
+local FONT_MEDIUM = SafeFont("GothamMedium", FONT)
+local FONT_BOLD   = SafeFont("GothamBold", Enum.Font.SourceSansBold)
+
+local GLYPH = {
+	Arrow    = utf8.char(0x2192),
+	Check    = utf8.char(0x2713),
+	Down     = utf8.char(0x25BE),
+	Up       = utf8.char(0x25B4),
+	Close    = utf8.char(0x2715),
+	Minimize = utf8.char(0x2013),
+	Dot      = utf8.char(0x25CF),
+}
+
+local ICONS = {
+	home = "home", main = "home", dashboard = "home", lobby = "home", hub = "home",
+	settings = "settings", gear = "settings", config = "settings", options = "settings", setup = "settings",
+	credits = "heart", heart = "heart", love = "heart", donators = "heart", support = "heart",
+	info = "info", about = "info", help = "info", faq = "info", guide = "book",
+	list = "list", menu = "list", task = "list", tasks = "list", quests = "list", log = "list",
+	search = "search", find = "search", inspect = "search", lookup = "search",
+	misc = "misc", items = "misc", other = "misc", extra = "misc", utilities = "misc",
+
+	["arrow-right"] = "chevron-right", ["arrow_right"] = "chevron-right", arrowright = "chevron-right",
+	["arrow-left"] = "chevron-left", ["arrow_left"] = "chevron-left", arrowleft = "chevron-left",
+	["chevron-right"] = "chevron-right", ["chevron_right"] = "chevron-right", chevronright = "chevron-right",
+	["chevron-left"] = "chevron-left", ["chevron_left"] = "chevron-left", chevronleft = "chevron-left",
+	["chevron-down"] = "chevron-down", ["chevron_down"] = "chevron-down", chevrondown = "chevron-down",
+	arrow = "chevron-right", forward = "chevron-right", back = "chevron-left",
+
+	sword = "sword", combat = "sword", pvp = "sword", attack = "sword", weapon = "sword", weapons = "sword", fight = "sword",
+	shield = "shield", defense = "shield", protect = "shield", boss = "shield", armor = "shield",
+	target = "target", aim = "target", aimbot = "target", silentaim = "target", crosshair = "target", shoot = "target", gun = "target",
+	skull = "skull", kill = "skull", kills = "skull", death = "skull", dangerous = "skull", poison = "skull",
+
+	tools = "tools", tool = "tools", farm = "tools", autofarm = "tools", farming = "tools", training = "tools", train = "tools", build = "tools", craft = "tools",
+	bot = "bot", auto = "bot", robot = "bot", cpu = "bot", automation = "bot", ai = "bot", macro = "bot", loop = "bot",
+	play = "play", stages = "play", stage = "play", autoquest = "play", game = "play", start = "play", run = "speed",
+	refresh = "refresh", reload = "refresh", sync = "refresh", reset = "refresh", restart = "refresh", loop_arrow = "refresh",
+	layers = "layers", layer = "layers", stack = "layers", platform = "layers", platforms = "layers",
+
+	user = "user", player = "user", character = "user", avatar = "user", profile = "user", humanoid = "user",
+	speed = "speed", movement = "speed", walk = "speed", walkspeed = "speed", sprint = "speed", fast = "speed", dash = "speed",
+	rocket = "rocket", fly = "rocket", flight = "rocket", jump = "rocket", jumppower = "rocket", wings = "rocket", boost = "rocket",
+	teleport = "teleport", world = "teleport", worlds = "teleport", map = "teleport", maps = "teleport", globe = "teleport", zone = "teleport", travel = "teleport", waypoint = "teleport",
+	compass = "compass", radar = "compass", nav = "compass", direction = "compass",
+
+	shop = "shop", store = "shop", cart = "shop", market = "shop", buy = "shop", trade = "shop", merchant = "shop",
+	coin = "coin", coins = "coin", cash = "coin", money = "coin", currency = "coin", dollar = "coin", rich = "coin", gold = "coin",
+	diamond = "diamond", gem = "diamond", gems = "diamond", crystal = "diamond", crystals = "diamond", ruby = "diamond",
+	gift = "gift", rewards = "gift", reward = "gift", free = "gift", box = "gift", crate = "gift", chest = "gift", bundle = "gift",
+	trophy = "trophy", rank = "trophy", badge = "trophy", medal = "trophy", leaderboard = "trophy", top = "trophy", winner = "trophy",
+
+	eye = "eye", visuals = "eye", esp = "eye", chams = "eye", see = "eye", xray = "eye", render = "eye",
+	sun = "sun", light = "sun", day = "sun", brightness = "sun",
+	moon = "moon", dark = "moon", night = "moon",
+	flame = "flame", fire = "flame", hot = "flame", burn = "flame", streak = "flame",
+	bolt = "bolt", zap = "bolt", lightning = "bolt", energy = "bolt", power = "bolt", shock = "bolt", flash = "bolt",
+	star = "star", pets = "star", pet = "star", favorite = "star", vip = "star", premium = "star",
+
+	code = "code", script = "code", scripts = "code", dev = "code", execute = "code", console = "code", terminal = "code",
+	lock = "lock", unlock = "lock", security = "lock", key = "key", auth = "key", password = "key",
+	bell = "bell", alert = "bell", notification = "bell", notify = "bell",
+	book = "book", docs = "book", wiki = "book", manual = "book", tutorial = "book",
+	potion = "potion", buff = "potion", flask = "potion", heal = "potion", health = "potion", elixir = "potion",
+	music = "music", sound = "music", audio = "music", volume = "music", song = "music",
+	cloud = "cloud", server = "cloud", network = "cloud", ping = "cloud", online = "cloud",
+	folder = "folder", files = "folder", directory = "folder",
+	copy = "copy", clipboard = "copy",
+	trash = "trash", delete = "trash", remove = "trash", clear = "trash",
+	stats = "stats", chart = "stats", level = "stats", levels = "stats", progress = "stats",
+
+	sparkles = "sparkles", sparkle = "sparkles", effects = "sparkles", aura = "sparkles",
+	crown = "crown", royal = "crown", king = "crown",
+	users = "users", team = "users", friends = "users", party = "users",
+	backpack = "backpack", inventory = "backpack", bag = "backpack",
+	calendar = "calendar", daily = "calendar", events = "calendar",
+	clock = "clock", timer = "clock", time = "clock", history = "clock",
+	sliders = "sliders", adjustments = "sliders", tuning = "sliders",
+	gamepad = "gamepad", controller = "gamepad", controls = "gamepad",
+	link = "link", connect = "link", connection = "link",
+	download = "download", import = "download",
+	upload = "upload", export = "upload",
+	flag = "flag", checkpoint = "flag", mission = "flag",
+	default = "default",
+}
+
+local DEFAULT_WINDOW_SIZE = UDim2.fromOffset(580, 460)
+
+--==================================================
+-- GLOBAL RUNTIME SETTINGS
+--==================================================
+
+local Settings = {
+	Theme        = "DarkTheme",
+	CustomAccent = nil,
+	Scale        = 1,
+	Transparency = 0,
+	Animations   = true,
+	MinimizeKey  = Enum.KeyCode.RightControl,
+	Position     = nil,
+	ConfigName   = "default",
+	AutoLoad     = nil,
+}
+
+--==================================================
+-- UTILITY FUNCTIONS
+--==================================================
+
+local function New(className, properties, children)
+	local instance = Instance.new(className)
+
+	if properties then
+		for property, value in pairs(properties) do
+			if property ~= "Parent" then
+				instance[property] = value
+			end
+		end
+	end
+
+	if children then
+		for _, child in ipairs(children) do
+			child.Parent = instance
+		end
+	end
+
+	if properties and properties.Parent then
+		instance.Parent = properties.Parent
+	end
+
+	return instance
+end
+
+local function SafeCallback(callback, ...)
+	if typeof(callback) ~= "function" then
+		return
+	end
+
+	local packed = table.pack(...)
+
+	local success, result = pcall(function()
+		return callback(table.unpack(packed, 1, packed.n))
+	end)
+
+	if not success then
+		warn("[NUTHERAFROX] Callback error:", result)
+		return nil
+	end
+
+	return result
+end
+
+local function Clamp(value, minimum, maximum)
+	if minimum > maximum then
+		minimum, maximum = maximum, minimum
+	end
+	return math.max(minimum, math.min(maximum, value))
+end
+
+local function Round(value, decimals)
+	decimals = decimals or 0
+	local multiplier = 10 ^ decimals
+	return math.floor(value * multiplier + 0.5) / multiplier
+end
+
+local function Lerp(a, b, alpha)
+	return a + (b - a) * alpha
+end
+
+local function GetInset()
+	local ok, inset = pcall(function()
+		return GuiService:GetGuiInset()
+	end)
+	if ok and inset then
+		return inset
+	end
+	return Vector2.new(0, 0)
+end
+
+local function InputToGui(position)
+	local inset = GetInset()
+	return Vector2.new(position.X + inset.X, position.Y + inset.Y)
+end
+
+local function IsTouchDevice()
+	local ok, touch = pcall(function()
+		return UserInputService.TouchEnabled and not UserInputService.MouseEnabled
+	end)
+	if ok then
+		return touch
+	end
+	return false
+end
+
+local function CopyToClipboard(text)
+	local functions = {}
+
+	if typeof(setclipboard) == "function" then
+		table.insert(functions, setclipboard)
+	end
+	if typeof(toclipboard) == "function" then
+		table.insert(functions, toclipboard)
+	end
+	if typeof(set_clipboard) == "function" then
+		table.insert(functions, set_clipboard)
+	end
+
+	if typeof(getgenv) == "function" then
+		local ok, env = pcall(getgenv)
+		if ok and typeof(env) == "table" then
+			for _, name in ipairs({ "setclipboard", "toclipboard", "set_clipboard" }) do
+				if typeof(env[name]) == "function" then
+					table.insert(functions, env[name])
+				end
+			end
+		end
+	end
+
+	for _, fn in ipairs(functions) do
+		local success = pcall(fn, text)
+		if success then
+			return true
+		end
+	end
+
+	return false
+end
+
+--==================================================
+-- FILE SYSTEM
+--==================================================
+
+local FS = {}
+
+function FS.Available()
+	return typeof(writefile) == "function"
+		and typeof(readfile) == "function"
+		and typeof(isfile) == "function"
+end
+
+function FS.FolderAvailable()
+	return typeof(makefolder) == "function" and typeof(isfolder) == "function"
+end
+
+function FS.EnsureFolder(path)
+	if not FS.FolderAvailable() then
+		return false
+	end
+
+	local ok, exists = pcall(isfolder, path)
+	if ok and exists then
+		return true
+	end
+
+	return (pcall(makefolder, path))
+end
+
+function FS.Exists(path)
+	if not FS.Available() then
+		return false
+	end
+	local ok, exists = pcall(isfile, path)
+	if ok and exists then
+		return true
+	end
+	return false
+end
+
+function FS.Write(path, content)
+	if not FS.Available() then
+		return false
+	end
+	return (pcall(writefile, path, content))
+end
+
+function FS.Read(path)
+	if not FS.Exists(path) then
+		return nil
+	end
+	local ok, content = pcall(readfile, path)
+	if ok then
+		return content
+	end
+	return nil
+end
+
+function FS.Delete(path)
+	if typeof(delfile) ~= "function" then
+		return false
+	end
+	return (pcall(delfile, path))
+end
+
+function FS.List(path)
+	if typeof(listfiles) ~= "function" then
+		return {}
+	end
+	local ok, files = pcall(listfiles, path)
+	if ok and typeof(files) == "table" then
+		return files
+	end
+	return {}
+end
+
+--==================================================
+-- CLEANUP SYSTEM (Maid)
+--==================================================
+
+local Maid = {}
+Maid.__index = Maid
+
+function Maid.new()
+	return setmetatable({ _tasks = {} }, Maid)
+end
+
+function Maid:Give(item)
+	if item == nil then
+		return nil
+	end
+	table.insert(self._tasks, item)
+	return item
+end
+
+local function CleanupItem(item)
+	local itemType = typeof(item)
+
+	if itemType == "RBXScriptConnection" then
+		pcall(function()
+			item:Disconnect()
+		end)
+	elseif itemType == "Instance" then
+		pcall(function()
+			item:Destroy()
+		end)
+	elseif itemType == "function" then
+		pcall(item)
+	elseif itemType == "table" then
+		if typeof(item.DoCleaning) == "function" then
+			pcall(function()
+				item:DoCleaning()
+			end)
+		elseif typeof(item.Destroy) == "function" then
+			pcall(function()
+				item:Destroy()
+			end)
+		elseif typeof(item.Cancel) == "function" then
+			pcall(function()
+				item:Cancel()
+			end)
+		end
+	end
+end
+
+function Maid:DoCleaning()
+	local tasks = self._tasks
+	self._tasks = {}
+
+	for index = #tasks, 1, -1 do
+		CleanupItem(tasks[index])
+	end
+end
+
+Maid.Destroy = Maid.DoCleaning
+
+--==================================================
+-- THEME SYSTEM
+--==================================================
+
+local Themes = {
+	DarkTheme = {
+		Background   = Color3.fromRGB(10, 10, 10),
+		Header       = Color3.fromRGB(16, 16, 16),
+		Element      = Color3.fromRGB(24, 24, 24),
+		ElementHover = Color3.fromRGB(36, 36, 36),
+		Text         = Color3.fromRGB(255, 255, 255),
+		SubText      = Color3.fromRGB(165, 165, 165),
+		Accent       = Color3.fromRGB(255, 255, 255),
+		Border       = Color3.fromRGB(48, 48, 48),
+	},
+
+	LightTheme = {
+		Background   = Color3.fromRGB(242, 242, 242),
+		Header       = Color3.fromRGB(255, 255, 255),
+		Element      = Color3.fromRGB(255, 255, 255),
+		ElementHover = Color3.fromRGB(232, 232, 232),
+		Text         = Color3.fromRGB(15, 15, 15),
+		SubText      = Color3.fromRGB(95, 95, 95),
+		Accent       = Color3.fromRGB(15, 15, 15),
+		Border       = Color3.fromRGB(214, 214, 214),
+	},
+
+	Serpent = {
+		Background   = Color3.fromRGB(8, 14, 10),
+		Header       = Color3.fromRGB(12, 20, 15),
+		Element      = Color3.fromRGB(18, 28, 22),
+		ElementHover = Color3.fromRGB(27, 41, 32),
+		Text         = Color3.fromRGB(236, 255, 242),
+		SubText      = Color3.fromRGB(139, 176, 151),
+		Accent       = Color3.fromRGB(0, 255, 140),
+		Border       = Color3.fromRGB(31, 61, 43),
+	},
+
+	Midnight = {
+		Background   = Color3.fromRGB(11, 14, 20),
+		Header       = Color3.fromRGB(16, 21, 30),
+		Element      = Color3.fromRGB(21, 28, 40),
+		ElementHover = Color3.fromRGB(30, 41, 59),
+		Text         = Color3.fromRGB(248, 250, 252),
+		SubText      = Color3.fromRGB(148, 163, 184),
+		Accent       = Color3.fromRGB(59, 130, 246),
+		Border       = Color3.fromRGB(30, 41, 59),
+	},
+
+	Crimson = {
+		Background   = Color3.fromRGB(14, 8, 8),
+		Header       = Color3.fromRGB(22, 12, 12),
+		Element      = Color3.fromRGB(30, 16, 16),
+		ElementHover = Color3.fromRGB(44, 24, 24),
+		Text         = Color3.fromRGB(255, 245, 245),
+		SubText      = Color3.fromRGB(200, 130, 130),
+		Accent       = Color3.fromRGB(239, 68, 68),
+		Border       = Color3.fromRGB(65, 26, 26),
+	},
+
+	Emerald = {
+		Background   = Color3.fromRGB(8, 16, 12),
+		Header       = Color3.fromRGB(12, 24, 18),
+		Element      = Color3.fromRGB(16, 34, 25),
+		ElementHover = Color3.fromRGB(24, 48, 36),
+		Text         = Color3.fromRGB(240, 255, 248),
+		SubText      = Color3.fromRGB(130, 190, 155),
+		Accent       = Color3.fromRGB(16, 185, 129),
+		Border       = Color3.fromRGB(24, 60, 42),
+	},
+
+	Amethyst = {
+		Background   = Color3.fromRGB(14, 10, 20),
+		Header       = Color3.fromRGB(20, 14, 30),
+		Element      = Color3.fromRGB(28, 20, 42),
+		ElementHover = Color3.fromRGB(40, 28, 60),
+		Text         = Color3.fromRGB(250, 245, 255),
+		SubText      = Color3.fromRGB(180, 150, 215),
+		Accent       = Color3.fromRGB(168, 85, 247),
+		Border       = Color3.fromRGB(55, 35, 80),
+	},
+
+	Sunset = {
+		Background   = Color3.fromRGB(18, 12, 8),
+		Header       = Color3.fromRGB(26, 17, 12),
+		Element      = Color3.fromRGB(36, 24, 16),
+		ElementHover = Color3.fromRGB(50, 34, 22),
+		Text         = Color3.fromRGB(255, 248, 240),
+		SubText      = Color3.fromRGB(210, 165, 135),
+		Accent       = Color3.fromRGB(245, 158, 11),
+		Border       = Color3.fromRGB(70, 44, 25),
+	},
+
+	Aqua = {
+		Background   = Color3.fromRGB(8, 16, 20),
+		Header       = Color3.fromRGB(12, 24, 30),
+		Element      = Color3.fromRGB(16, 32, 42),
+		ElementHover = Color3.fromRGB(24, 46, 60),
+		Text         = Color3.fromRGB(240, 253, 255),
+		SubText      = Color3.fromRGB(130, 195, 215),
+		Accent       = Color3.fromRGB(6, 182, 212),
+		Border       = Color3.fromRGB(25, 58, 75),
+	},
+
+	Rose = {
+		Background   = Color3.fromRGB(18, 10, 14),
+		Header       = Color3.fromRGB(26, 14, 20),
+		Element      = Color3.fromRGB(36, 20, 28),
+		ElementHover = Color3.fromRGB(52, 28, 40),
+		Text         = Color3.fromRGB(255, 242, 246),
+		SubText      = Color3.fromRGB(215, 145, 170),
+		Accent       = Color3.fromRGB(244, 63, 94),
+		Border       = Color3.fromRGB(70, 30, 50),
+	},
+}
+
+local ThemeAliases = {
+	Dark      = "DarkTheme",
+	Light     = "LightTheme",
+	dark      = "DarkTheme",
+	light     = "LightTheme",
+	serpent   = "Serpent",
+	midnight  = "Midnight",
+	blue      = "Midnight",
+	cyberblue = "Midnight",
+	crimson   = "Crimson",
+	red       = "Crimson",
+	blood     = "Crimson",
+	emerald   = "Emerald",
+	green     = "Emerald",
+	mint      = "Emerald",
+	amethyst  = "Amethyst",
+	purple    = "Amethyst",
+	violet    = "Amethyst",
+	sunset    = "Sunset",
+	gold      = "Sunset",
+	orange    = "Sunset",
+	amber     = "Sunset",
+	aqua      = "Aqua",
+	cyan      = "Aqua",
+	teal      = "Aqua",
+	rose      = "Rose",
+	pink      = "Rose",
+	Default   = "DarkTheme",
+	NF        = "DarkTheme",
+}
+
+local function ResolveThemeName(name)
+	if typeof(name) ~= "string" then
+		return "DarkTheme"
+	end
+	if Themes[name] then
+		return name
+	end
+	if ThemeAliases[name] and Themes[ThemeAliases[name]] then
+		return ThemeAliases[name]
+	end
+	return "DarkTheme"
+end
+
+local CurrentThemeName = "DarkTheme"
+local Theme = Themes.DarkTheme
+
+local function T(key)
+	local value = Theme[key]
+	if value == nil then
+		return Color3.fromRGB(255, 0, 255)
+	end
+	return value
+end
+
+local ThemeRegistry = {}
+local ThemeChangedListeners = {}
+
+local function ApplyThemeTo(instance, map)
+	for property, key in pairs(map) do
+		local value
+
+		if typeof(key) == "function" then
+			value = key(Theme)
+		else
+			value = Theme[key]
+		end
+
+		if value ~= nil then
+			pcall(function()
+				instance[property] = value
+			end)
+		end
+	end
+end
+
+local function RegisterTheme(instance, map)
+	table.insert(ThemeRegistry, { Instance = instance, Map = map })
+	ApplyThemeTo(instance, map)
+	return instance
+end
+
+local function ApplyTheme()
+	for index = #ThemeRegistry, 1, -1 do
+		local entry = ThemeRegistry[index]
+		local instance = entry.Instance
+
+		local ok, parent = pcall(function()
+			return instance.Parent
+		end)
+
+		if ok and parent ~= nil then
+			ApplyThemeTo(instance, entry.Map)
+		else
+			table.remove(ThemeRegistry, index)
+		end
+	end
+
+	for _, listener in ipairs(ThemeChangedListeners) do
+		SafeCallback(listener, Theme, CurrentThemeName)
+	end
+end
+
+local function OnThemeChanged(listener)
+	table.insert(ThemeChangedListeners, listener)
+end
+
+local function SetCustomAccentInternal(color)
+	if typeof(color) == "Color3" then
+		Settings.CustomAccent = color
+		Theme.Accent = color
+	else
+		Settings.CustomAccent = nil
+		local baseTheme = Themes[CurrentThemeName]
+		if baseTheme then
+			Theme.Accent = baseTheme.Accent
+		end
+	end
+	ApplyTheme()
+end
+
+local function SetThemeInternal(name, preserveCustomAccent)
+	local resolved = ResolveThemeName(name)
+	CurrentThemeName = resolved
+	Theme = Themes[resolved]
+	if not preserveCustomAccent then
+		Settings.CustomAccent = nil
+	elseif Settings.CustomAccent and typeof(Settings.CustomAccent) == "Color3" then
+		Theme.Accent = Settings.CustomAccent
+	end
+	Settings.Theme = resolved
+	ApplyTheme()
+	if typeof(Library) == "table" and Library.Options and Library.Options.__NFCustomAccent then
+		Library.Options.__NFCustomAccent:SetValue(Theme.Accent, 0, true)
+	end
+	return resolved
+end
+
+--==================================================
+-- ANIMATION SYSTEM
+--==================================================
+
+local ActiveTweens = {}
+local TweenSequence = 0
+
+local SPEED = {
+	Fast   = 0.12,
+	Normal = 0.20,
+	Slow   = 0.34,
+}
+
+local function Tween(object, properties, duration, easingStyle, easingDirection)
+	if typeof(object) ~= "Instance" then
+		return nil
+	end
+
+	if not Settings.Animations then
+		for property, value in pairs(properties) do
+			pcall(function()
+				object[property] = value
+			end)
+		end
+		return nil
+	end
+
+	local info = TweenInfo.new(
+		duration or SPEED.Normal,
+		easingStyle or Enum.EasingStyle.Quad,
+		easingDirection or Enum.EasingDirection.Out
+	)
+
+	local ok, tween = pcall(function()
+		return TweenService:Create(object, info, properties)
+	end)
+
+	if not ok or not tween then
+		for property, value in pairs(properties) do
+			pcall(function()
+				object[property] = value
+			end)
+		end
+		return nil
+	end
+
+	TweenSequence += 1
+	ActiveTweens[tween] = {Object = object, Goals = properties, Order = TweenSequence}
+
+	tween.Completed:Connect(function()
+		ActiveTweens[tween] = nil
+	end)
+
+	tween:Play()
+
+	return tween
+end
+
+local function CancelAllTweens(finish)
+	local pending = {}
+	for tween in pairs(ActiveTweens) do
+		table.insert(pending, {Tween = tween, Target = ActiveTweens[tween]})
+	end
+	table.sort(pending, function(a, b) return a.Target.Order < b.Target.Order end)
+	for _, entry in ipairs(pending) do
+		pcall(function()
+			entry.Tween:Cancel()
+		end)
+		if finish and entry.Target.Object.Parent then
+			for property, value in pairs(entry.Target.Goals) do
+				pcall(function() entry.Target.Object[property] = value end)
+			end
+		end
+	end
+	table.clear(ActiveTweens)
+end
+
+--==================================================
+-- SHARED UI HELPERS
+--==================================================
+
+local function Corner(parent, radius)
+	return New("UICorner", {
+		Parent = parent,
+		CornerRadius = UDim.new(0, radius or 8),
+	})
+end
+
+local function Stroke(parent, themeKey, thickness, transparency)
+	local stroke = New("UIStroke", {
+		Parent = parent,
+		Thickness = thickness or 1,
+		Transparency = transparency or 0,
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	})
+
+	RegisterTheme(stroke, { Color = themeKey or "Border" })
+
+	return stroke
+end
+
+local function Padding(parent, top, bottom, left, right)
+	return New("UIPadding", {
+		Parent = parent,
+		PaddingTop = UDim.new(0, top or 0),
+		PaddingBottom = UDim.new(0, bottom or top or 0),
+		PaddingLeft = UDim.new(0, left or 0),
+		PaddingRight = UDim.new(0, right or left or 0),
+	})
+end
+
+local function ListLayout(parent, padding, direction, verticalAlignment)
+	return New("UIListLayout", {
+		Parent = parent,
+		FillDirection = direction or Enum.FillDirection.Vertical,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, padding or 8),
+		VerticalAlignment = verticalAlignment or Enum.VerticalAlignment.Top,
+	})
+end
+
+local function CreateLineGlyph(parent, kind, size, zIndex)
+	size = size or 20
+	zIndex = zIndex or (parent.ZIndex + 1)
+
+	local holder = New("Frame", {
+		Name = "Glyph",
+		Parent = parent,
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(size, size),
+		ZIndex = zIndex,
+	})
+
+	local canvas = New("Frame", {
+		Name = "Canvas",
+		Parent = holder,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.fromOffset(20, 20),
+		BackgroundTransparency = 1,
+		ZIndex = zIndex,
+	})
+
+	New("UIScale", { Parent = canvas, Scale = size / 20 })
+
+	local parts = {}
+
+	local function Line(x, y, length, rotation, thickness)
+		local line = New("Frame", {
+			Parent = canvas,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromOffset(x, y),
+			Size = UDim2.fromOffset(length, thickness or 2),
+			Rotation = rotation or 0,
+			BackgroundColor3 = T("SubText"),
+			BorderSizePixel = 0,
+			ZIndex = zIndex,
+		})
+		Corner(line, 2)
+		table.insert(parts, line)
+		return line
+	end
+
+	local function Ring(x, y, width, height, thickness)
+		local ring = New("Frame", {
+			Parent = canvas,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromOffset(x, y),
+			Size = UDim2.fromOffset(width, height or width),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ZIndex = zIndex,
+		})
+		Corner(ring, math.floor(math.min(width, height or width) / 2))
+		local stroke = New("UIStroke", {
+			Parent = ring,
+			Color = T("SubText"),
+			Thickness = thickness or 2,
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+		})
+		table.insert(parts, stroke)
+		return ring
+	end
+
+	local function Rect(x, y, width, height, cornerRadius, thickness)
+		local rect = New("Frame", {
+			Parent = canvas,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromOffset(x, y),
+			Size = UDim2.fromOffset(width, height),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ZIndex = zIndex,
+		})
+		if cornerRadius and cornerRadius > 0 then
+			Corner(rect, cornerRadius)
+		end
+		local stroke = New("UIStroke", {
+			Parent = rect,
+			Color = T("SubText"),
+			Thickness = thickness or 1.8,
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+		})
+		table.insert(parts, stroke)
+		return rect
+	end
+
+	local function Dot(x, y, radius)
+		local dot = New("Frame", {
+			Parent = canvas,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromOffset(x, y),
+			Size = UDim2.fromOffset(radius or 3, radius or 3),
+			BackgroundColor3 = T("SubText"),
+			BorderSizePixel = 0,
+			ZIndex = zIndex,
+		})
+		Corner(dot, math.floor((radius or 3) / 2))
+		table.insert(parts, dot)
+		return dot
+	end
+
+	kind = tostring(kind or "default"):lower()
+
+	if kind == "close" then
+		Line(10, 10, 12, 45, 2)
+		Line(10, 10, 12, -45, 2)
+	elseif kind == "success" or kind == "check" then
+		Line(7.2, 11.5, 7, 45, 2.2)
+		Line(12.5, 9, 11, -45, 2.2)
+	elseif kind == "error" then
+		Ring(10, 10, 16, 16, 1.8)
+		Line(10, 10, 8, 45, 2)
+		Line(10, 10, 8, -45, 2)
+	elseif kind == "warning" then
+		Line(6.3, 10.5, 14, -60, 2)
+		Line(13.7, 10.5, 14, 60, 2)
+		Line(10, 16.5, 14, 0, 2)
+		Line(10, 9.5, 5, 90, 1.8)
+		Ring(10, 13.5, 1.8, 1.8, 1.2)
+	elseif kind == "loading" then
+		Ring(5, 10, 3, 3, 1.5)
+		Ring(10, 10, 3, 3, 1.5)
+		Ring(15, 10, 3, 3, 1.5)
+	elseif kind == "minimize" then
+		Line(10, 11, 11, 0, 2)
+	elseif kind == "chevron-right" or kind == "arrow-right" or kind == "arrow" then
+		Line(9, 7.5, 7, 45, 2)
+		Line(9, 12.5, 7, -45, 2)
+	elseif kind == "chevron-left" or kind == "arrow-left" then
+		Line(11, 7.5, 7, -45, 2)
+		Line(11, 12.5, 7, 45, 2)
+	elseif kind == "chevron-down" then
+		Line(7.5, 9, 7, 45, 2)
+		Line(12.5, 9, 7, -45, 2)
+	elseif kind == "refresh" or kind == "reload" or kind == "sync" or kind == "reset" then
+		Ring(10, 10, 13, 13, 1.8)
+		Line(14.5, 7, 4, 45, 1.8)
+		Line(14.5, 7, 4, -45, 1.8)
+	elseif kind == "layers" or kind == "platform" then
+		Line(10, 5.5, 13, 0, 1.8)
+		Line(10, 10, 13, 0, 1.8)
+		Line(10, 14.5, 13, 0, 1.8)
+	elseif kind == "home" then
+		Line(6.5, 7, 9, -45, 2)
+		Line(13.5, 7, 9, 45, 2)
+		Line(5, 13, 10, 90, 2)
+		Line(15, 13, 10, 90, 2)
+		Line(10, 18, 10, 0, 2)
+	elseif kind == "stats" then
+		Line(4, 14, 6, 90, 2.5)
+		Line(9, 11.5, 11, 90, 2.5)
+		Line(14, 9, 16, 90, 2.5)
+	elseif kind == "teleport" then
+		Ring(10, 10, 16, 16, 1.8)
+		Line(10, 10, 14, 0, 1.5)
+		Line(10, 10, 14, 90, 1.5)
+		Ring(10, 10, 8, 16, 1.2)
+	elseif kind == "settings" then
+		Ring(10, 10, 10, 10, 1.8)
+		Ring(10, 10, 3, 3, 1.5)
+		Line(10, 2.5, 4, 90, 2.5)
+		Line(10, 17.5, 4, 90, 2.5)
+		Line(2.5, 10, 4, 0, 2.5)
+		Line(17.5, 10, 4, 0, 2.5)
+	elseif kind == "user" then
+		Ring(10, 6.5, 6, 6, 1.8)
+		Line(6.5, 14, 7, -35, 2)
+		Line(13.5, 14, 7, 35, 2)
+		Line(10, 16.8, 9, 0, 2)
+	elseif kind == "tools" then
+		Line(10, 10, 17, 45, 2.2)
+		Line(10, 10, 15, -45, 2.2)
+		Line(4.5, 4.5, 5, 0, 2)
+		Line(15, 4.7, 4, 90, 2)
+	elseif kind == "list" then
+		for y = 5, 15, 5 do
+			Ring(4, y, 2.5, 2.5, 1.5)
+			Line(12, y, 10, 0, 2)
+		end
+	elseif kind == "play" then
+		Line(8.5, 7, 10, 55, 2)
+		Line(8.5, 13, 10, -55, 2)
+		Line(12.7, 10, 7, 90, 2)
+	elseif kind == "eye" then
+		Line(6, 7, 10, -28, 2)
+		Line(14, 7, 10, 28, 2)
+		Line(6, 13, 10, 28, 2)
+		Line(14, 13, 10, -28, 2)
+		Ring(10, 10, 4.5, 4.5, 1.5)
+	elseif kind == "shield" then
+		Line(6.5, 5, 8, -20, 2)
+		Line(13.5, 5, 8, 20, 2)
+		Line(5.3, 11, 11, 78, 2)
+		Line(14.7, 11, 11, -78, 2)
+		Line(10, 16.3, 9, 0, 2)
+	elseif kind == "search" then
+		Ring(8.5, 8.5, 11, 11, 2)
+		Line(14.5, 14.5, 7, 45, 2)
+	elseif kind == "info" then
+		Ring(10, 10, 16, 16, 1.8)
+		Ring(10, 6, 2, 2, 1.5)
+		Line(10, 12, 7, 90, 2)
+	elseif kind == "heart" then
+		Ring(7, 7, 7, 7, 1.8)
+		Ring(13, 7, 7, 7, 1.8)
+		Line(6.2, 12, 10, 45, 2)
+		Line(13.8, 12, 10, -45, 2)
+	elseif kind == "star" or kind == "sun" then
+		Ring(10, 10, 6, 6, 1.8)
+		for rotation = 0, 135, 45 do
+			Line(10, 10, 17, rotation, 1.5)
+		end
+	elseif kind == "bolt" then
+		Line(11, 6, 9, -58, 2.5)
+		Line(9, 14, 9, -58, 2.5)
+		Line(10, 10, 7, 0, 2.5)
+	elseif kind == "sword" then
+		Line(11, 8.5, 14, 45, 2.2)
+		Line(6.5, 13.5, 7, -45, 2.2)
+		Line(4.5, 15.5, 4, 45, 2.2)
+		Dot(3, 17, 2.5)
+	elseif kind == "target" then
+		Ring(10, 10, 15, 15, 1.8)
+		Ring(10, 10, 6, 6, 1.4)
+		Dot(10, 10, 2)
+		Line(10, 2.5, 3.5, 90, 1.6)
+		Line(10, 17.5, 3.5, 90, 1.6)
+		Line(2.5, 10, 3.5, 0, 1.6)
+		Line(17.5, 10, 3.5, 0, 1.6)
+	elseif kind == "shop" then
+		Line(4.5, 5.5, 4, 0, 2)
+		Line(6, 9, 8, 70, 2)
+		Line(10.5, 13, 8, 0, 2)
+		Line(14.5, 9.5, 8, -75, 2)
+		Ring(7.5, 16.5, 3.5, 3.5, 1.5)
+		Ring(13.5, 16.5, 3.5, 3.5, 1.5)
+	elseif kind == "coin" then
+		Ring(10, 10, 16, 16, 1.8)
+		Line(10, 10, 10, 90, 1.6)
+		Line(10, 7.5, 5, 0, 1.6)
+		Line(10, 12.5, 5, 0, 1.6)
+		Line(12, 8.5, 3, 90, 1.6)
+		Line(8, 11.5, 3, 90, 1.6)
+	elseif kind == "diamond" then
+		Line(10, 5.5, 9, 0, 1.8)
+		Line(4.5, 8, 6, 45, 1.8)
+		Line(15.5, 8, 6, -45, 1.8)
+		Line(10, 10.5, 14, 0, 1.8)
+		Line(6.5, 14.5, 10, -55, 1.8)
+		Line(13.5, 14.5, 10, 55, 1.8)
+		Line(10, 14, 7, 90, 1.4)
+	elseif kind == "flame" then
+		Line(6.5, 13, 9, 25, 2)
+		Line(13.5, 13, 9, -25, 2)
+		Line(10, 17, 8, 0, 2)
+		Ring(10, 13.5, 4.5, 6, 1.5)
+		Line(10, 6, 6, 90, 2)
+	elseif kind == "speed" then
+		Line(4.5, 6, 6, 0, 1.8)
+		Line(3, 10, 8, 0, 1.8)
+		Line(5, 14, 6, 0, 1.8)
+		Line(11.5, 9.5, 13, 65, 2.5)
+		Line(15.5, 5, 5, 0, 2)
+		Line(13.5, 15, 6, 20, 2)
+	elseif kind == "rocket" then
+		Rect(10, 8.5, 6, 9, 3, 1.8)
+		Line(8.5, 4.5, 4.5, 45, 1.8)
+		Line(11.5, 4.5, 4.5, -45, 1.8)
+		Line(5, 13.5, 5, -35, 2)
+		Line(15, 13.5, 5, 35, 2)
+		Line(10, 15.5, 4, 0, 1.8)
+		Line(10, 17.5, 3.5, 90, 2)
+	elseif kind == "bot" then
+		Rect(10, 11, 13, 10, 3, 1.8)
+		Line(10, 4.5, 3, 90, 1.8)
+		Dot(10, 2.5, 2.5)
+		Line(2.5, 11, 3, 90, 1.8)
+		Line(17.5, 11, 3, 90, 1.8)
+		Dot(7.5, 9.5, 2.5)
+		Dot(12.5, 9.5, 2.5)
+		Line(10, 13.5, 6, 0, 1.6)
+	elseif kind == "code" then
+		Line(6.5, 8, 6, -45, 2)
+		Line(6.5, 12, 6, 45, 2)
+		Line(13.5, 8, 6, 45, 2)
+		Line(13.5, 12, 6, -45, 2)
+		Line(10, 10, 11, 65, 1.8)
+	elseif kind == "lock" then
+		Ring(10, 7, 8, 8, 1.8)
+		Rect(10, 13.5, 13, 9, 2.5, 1.8)
+		Dot(10, 12.5, 2.2)
+		Line(10, 14.5, 2.5, 90, 1.6)
+	elseif kind == "key" then
+		Ring(7, 7, 7, 7, 1.8)
+		Line(12.5, 12.5, 11, 45, 2)
+		Line(14, 11, 3, -45, 2)
+		Line(16.5, 13.5, 3, -45, 2)
+	elseif kind == "bell" then
+		Ring(10, 9, 10, 10, 1.8)
+		Line(10, 14, 13, 0, 2)
+		Dot(10, 16.5, 3)
+		Dot(10, 3.5, 2.5)
+	elseif kind == "gift" then
+		Rect(10, 13, 13, 9, 2, 1.8)
+		Rect(10, 7.5, 15, 3.5, 2, 1.8)
+		Line(10, 11, 14, 90, 1.8)
+		Ring(8, 4.5, 3.5, 3.5, 1.4)
+		Ring(12, 4.5, 3.5, 3.5, 1.4)
+	elseif kind == "trophy" then
+		Rect(10, 7, 10, 7, 3, 1.8)
+		Ring(4.5, 7, 4, 5, 1.5)
+		Ring(15.5, 7, 4, 5, 1.5)
+		Line(10, 12.5, 4, 90, 2)
+		Line(10, 15.5, 10, 0, 2)
+	elseif kind == "skull" then
+		Ring(10, 8, 12, 10, 1.8)
+		Dot(7.5, 8, 2.5)
+		Dot(12.5, 8, 2.5)
+		Line(10, 14.5, 6, 0, 2)
+		Line(8, 13.5, 2.5, 90, 1.6)
+		Line(12, 13.5, 2.5, 90, 1.6)
+	elseif kind == "book" then
+		Line(10, 10.5, 11, 90, 2)
+		Line(5.5, 6, 8, 15, 1.8)
+		Line(5.5, 15, 8, 15, 1.8)
+		Line(2, 10.5, 9, 90, 1.8)
+		Line(14.5, 6, 8, -15, 1.8)
+		Line(14.5, 15, 8, -15, 1.8)
+		Line(18, 10.5, 9, 90, 1.8)
+	elseif kind == "potion" then
+		Line(10, 3, 4, 0, 2)
+		Line(10, 5, 4, 90, 2)
+		Ring(10, 12.5, 11, 11, 1.8)
+		Line(10, 13, 7, 0, 1.5)
+	elseif kind == "music" then
+		Dot(6.5, 14.5, 4)
+		Dot(14.5, 12.5, 4)
+		Line(8, 10.5, 9, 90, 1.8)
+		Line(16, 8.5, 9, 90, 1.8)
+		Line(12, 5.5, 8.5, -15, 2.5)
+	elseif kind == "cloud" then
+		Line(10, 15, 12, 0, 2)
+		Ring(6.5, 13, 6, 6, 1.6)
+		Ring(10, 10.5, 8, 8, 1.6)
+		Ring(14, 13, 6, 6, 1.6)
+	elseif kind == "moon" then
+		Ring(10, 10, 14, 14, 1.8)
+		Line(12, 7, 6, 45, 1.8)
+		Line(12, 13, 6, -45, 1.8)
+		Line(14, 10, 6, 90, 1.8)
+	elseif kind == "compass" then
+		Ring(10, 10, 16, 16, 1.8)
+		Line(10, 10, 10, 45, 2.2)
+		Dot(10, 10, 2.5)
+	elseif kind == "folder" then
+		Line(6, 5, 5, 0, 2)
+		Rect(10, 11.5, 14, 10, 2, 1.8)
+	elseif kind == "copy" then
+		Rect(12, 8, 9, 11, 2, 1.6)
+		Rect(8, 12, 9, 11, 2, 1.6)
+	elseif kind == "trash" then
+		Line(10, 3.5, 4, 0, 1.8)
+		Line(10, 5.5, 13, 0, 2)
+		Rect(10, 12.5, 9, 10, 2, 1.8)
+		Line(8.5, 12.5, 5, 90, 1.4)
+		Line(11.5, 12.5, 5, 90, 1.4)
+	elseif kind == "sparkles" then
+		for _, spec in ipairs({{8, 10, 12}, {15, 4, 5}, {16, 16, 4}}) do
+			Line(spec[1], spec[2], spec[3], 0, 1.6)
+			Line(spec[1], spec[2], spec[3], 90, 1.6)
+		end
+		Line(8, 10, 6, 45, 1.3); Line(8, 10, 6, -45, 1.3)
+	elseif kind == "crown" then
+		Line(10, 16, 13, 0, 1.8)
+		Line(3.5, 10.5, 9, 80, 1.8); Line(16.5, 10.5, 9, -80, 1.8)
+		Line(5.5, 8.5, 6, 45, 1.8); Line(8.5, 8, 8, -65, 1.8)
+		Line(11.5, 8, 8, 65, 1.8); Line(14.5, 8.5, 6, -45, 1.8)
+	elseif kind == "users" then
+		Ring(7, 6, 5, 5, 1.6); Ring(14, 7, 4, 4, 1.5)
+		Rect(7, 14, 10, 6, 3, 1.7); Rect(15, 14.5, 5, 5, 2, 1.5)
+	elseif kind == "backpack" then
+		Ring(10, 4, 6, 4, 1.6); Rect(10, 11, 13, 14, 4, 1.8)
+		Rect(10, 13.5, 8, 5, 1.5, 1.4); Line(10, 7.5, 4, 0, 1.5)
+	elseif kind == "calendar" then
+		Rect(10, 11, 15, 13, 2, 1.7); Line(10, 8.5, 14, 0, 1.5)
+		Line(6, 4.5, 5, 90, 1.8); Line(14, 4.5, 5, 90, 1.8)
+		for _, x in ipairs({6, 10, 14}) do Dot(x, 12, 2); Dot(x, 15, 2) end
+	elseif kind == "clock" then
+		Ring(10, 10, 16, 16, 1.8)
+		Line(10, 7, 6, 90, 1.8); Line(12, 11, 5, 27, 1.8)
+	elseif kind == "sliders" then
+		for i, x in ipairs({4, 10, 16}) do
+			Line(x, 10, 15, 90, 1.4)
+			Rect(x, i == 2 and 13 or 7, 4, 4, 1, 1.6)
+		end
+	elseif kind == "gamepad" then
+		Rect(10, 11, 17, 11, 4, 1.8)
+		Line(6, 11, 5, 0, 1.6); Line(6, 11, 5, 90, 1.6)
+		Dot(13, 10, 2); Dot(16, 12, 2)
+	elseif kind == "link" then
+		local a = Rect(6.5, 12.5, 10, 6, 3, 1.8); a.Rotation = -45
+		local b = Rect(13.5, 6.5, 10, 6, 3, 1.8); b.Rotation = -45
+		Line(10, 9.5, 7, -45, 1.7)
+	elseif kind == "download" or kind == "upload" then
+		Line(10, 8, 11, 90, 1.8)
+		local y, direction = kind == "download" and 10.5 or 5.5, kind == "download" and 1 or -1
+		Line(7.5, y, 7, direction * 45, 1.8); Line(12.5, y, 7, -direction * 45, 1.8)
+		Line(10, 17, 14, 0, 1.8); Line(3, 15, 4, 90, 1.8); Line(17, 15, 4, 90, 1.8)
+	elseif kind == "flag" then
+		Line(4, 10, 16, 90, 1.8); Rect(10, 6, 12, 7, 1, 1.6)
+	elseif kind:sub(1, 13) == "rbxassetid://" or tonumber(kind) ~= nil then
+		local asset = tonumber(kind) and ("rbxassetid://" .. kind) or kind
+		local img = New("ImageLabel", {
+			Parent = canvas,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromScale(0.85, 0.85),
+			BackgroundTransparency = 1,
+			Image = asset,
+			ImageColor3 = T("SubText"),
+			ZIndex = zIndex,
+		})
+		table.insert(parts, img)
+	elseif kind == "misc" then
+		Ring(10, 6, 6, 6, 1.7)
+		Ring(6.5, 13, 6, 6, 1.7)
+		Ring(13.5, 13, 6, 6, 1.7)
+	else
+		Ring(6.5, 6.5, 4, 4, 1.6)
+		Ring(13.5, 6.5, 4, 4, 1.6)
+		Ring(6.5, 13.5, 4, 4, 1.6)
+		Ring(13.5, 13.5, 4, 4, 1.6)
+	end
+
+	return holder, parts
+end
+
+local function SetGlyphColor(parts, color)
+	for _, part in ipairs(parts) do
+		if part:IsA("UIStroke") then
+			part.Color = color
+		elseif part:IsA("ImageLabel") then
+			part.ImageColor3 = color
+		else
+			part.BackgroundColor3 = color
+		end
+	end
+end
+
+local function RegisterGlyphTheme(parts, resolver)
+	for _, part in ipairs(parts) do
+		local prop = "BackgroundColor3"
+		if part:IsA("UIStroke") then
+			prop = "Color"
+		elseif part:IsA("ImageLabel") then
+			prop = "ImageColor3"
+		end
+		RegisterTheme(part, { [prop] = resolver })
+	end
+end
+
+local function TweenGlyphColor(parts, color)
+	for _, part in ipairs(parts) do
+		local property = part:IsA("UIStroke") and "Color" or (part:IsA("ImageLabel") and "ImageColor3" or "BackgroundColor3")
+		Tween(part, {[property] = color}, SPEED.Fast)
+	end
+end
+
+local function ResolveTabIcon(icon, title)
+	local requested = tostring(icon or ""):lower():match("^%s*(.-)%s*$")
+	if requested:match("^rbxassetid://%d+$") or requested:match("^%d+$") then
+		return requested
+	end
+	if ICONS[requested] then
+		return ICONS[requested]
+	end
+
+	local search = (requested .. " " .. tostring(title or "")):lower()
+	local keywords = {
+		{ "setting", "settings" }, { "config", "settings" }, { "option", "settings" },
+		{ "main", "home" }, { "home", "home" }, { "hub", "home" }, { "dash", "home" },
+		{ "sword", "sword" }, { "combat", "sword" }, { "pvp", "sword" }, { "attack", "sword" }, { "weapon", "sword" },
+		{ "target", "target" }, { "aim", "target" }, { "aimbot", "target" }, { "shoot", "target" }, { "gun", "target" },
+		{ "bot", "bot" }, { "auto", "bot" }, { "macro", "bot" }, { "robot", "bot" }, { "cpu", "bot" },
+		{ "shop", "shop" }, { "store", "shop" }, { "cart", "shop" }, { "market", "shop" }, { "buy", "shop" },
+		{ "coin", "coin" }, { "cash", "coin" }, { "money", "coin" }, { "gold", "coin" },
+		{ "diamond", "diamond" }, { "gem", "diamond" }, { "crystal", "diamond" },
+		{ "speed", "speed" }, { "walk", "speed" }, { "sprint", "speed" }, { "movement", "speed" },
+		{ "rocket", "rocket" }, { "fly", "rocket" }, { "flight", "rocket" }, { "jump", "rocket" }, { "boost", "rocket" },
+		{ "teleport", "teleport" }, { "map", "teleport" }, { "world", "teleport" }, { "travel", "teleport" }, { "zone", "teleport" },
+		{ "compass", "compass" }, { "radar", "compass" }, { "nav", "compass" },
+		{ "stat", "stats" }, { "chart", "stats" }, { "level", "stats" }, { "rank", "trophy" }, { "leader", "trophy" },
+		{ "reward", "gift" }, { "gift", "gift" }, { "box", "gift" }, { "crate", "gift" }, { "chest", "gift" },
+		{ "trophy", "trophy" }, { "badge", "trophy" }, { "medal", "trophy" },
+		{ "visual", "eye" }, { "esp", "eye" }, { "cham", "eye" }, { "xray", "eye" },
+		{ "player", "user" }, { "character", "user" }, { "avatar", "user" },
+		{ "train", "tools" }, { "farm", "tools" }, { "tool", "tools" }, { "build", "tools" }, { "craft", "tools" },
+		{ "stage", "play" }, { "play", "play" }, { "game", "play" },
+		{ "boss", "shield" }, { "protect", "shield" }, { "shield", "shield" }, { "defense", "shield" },
+		{ "skull", "skull" }, { "kill", "skull" }, { "death", "skull" },
+		{ "book", "book" }, { "doc", "book" }, { "wiki", "book" }, { "guide", "book" },
+		{ "potion", "potion" }, { "buff", "potion" }, { "heal", "potion" }, { "health", "potion" },
+		{ "music", "music" }, { "sound", "music" }, { "audio", "music" },
+		{ "script", "code" }, { "code", "code" }, { "dev", "code" }, { "exec", "code" },
+		{ "lock", "lock" }, { "key", "key" },
+		{ "bell", "bell" }, { "alert", "bell" }, { "notif", "bell" },
+		{ "cloud", "cloud" }, { "server", "cloud" }, { "ping", "cloud" },
+		{ "flame", "flame" }, { "fire", "flame" }, { "streak", "flame" },
+		{ "bolt", "bolt" }, { "lightn", "bolt" }, { "power", "bolt" },
+		{ "pet", "star" }, { "favorite", "star" }, { "star", "star" }, { "vip", "star" },
+		{ "credit", "heart" }, { "heart", "heart" },
+		{ "search", "search" },
+		{ "misc", "misc" }, { "item", "misc" },
+	}
+
+	for _, entry in ipairs(keywords) do
+		if string.find(search, entry[1], 1, true) then
+			return entry[2]
+		end
+	end
+
+	return "default"
+end
+
+--==================================================
+-- DRAG SYSTEM
+--==================================================
+
+local function MakeDraggable(frame, handle, maid, options)
+	options = options or {}
+
+	local dragging = false
+	local moved = false
+	local dragStart = Vector2.new()
+	local startPosition = frame.Position
+	local activeInput = nil
+
+	local function UpdatePosition(inputPosition)
+		local delta = Vector2.new(inputPosition.X, inputPosition.Y) - dragStart
+
+		if math.abs(delta.X) > 4 or math.abs(delta.Y) > 4 then
+			moved = true
+		end
+
+		local newX = startPosition.X.Offset + delta.X
+		local newY = startPosition.Y.Offset + delta.Y
+
+		local container = frame.Parent
+
+		if container then
+			local ok, viewport = pcall(function()
+				return container.AbsoluteSize
+			end)
+
+			if ok and viewport and viewport.X > 0 then
+				local size = frame.AbsoluteSize
+				local margin = 46
+
+				local baseX = startPosition.X.Scale * viewport.X
+				local baseY = startPosition.Y.Scale * viewport.Y
+
+				if options.KeepInBounds then
+					local inset = 14
+					newX = Clamp(newX, inset - baseX, math.max(inset, viewport.X - size.X - inset) - baseX)
+					newY = Clamp(newY, inset - baseY, math.max(inset, viewport.Y - size.Y - inset) - baseY)
+				else
+					newX = Clamp(newX, -baseX - size.X + margin, viewport.X - baseX - margin)
+					newY = Clamp(newY, -baseY, viewport.Y - baseY - margin)
+				end
+			end
+		end
+
+		frame.Position = UDim2.new(startPosition.X.Scale, newX, startPosition.Y.Scale, newY)
+	end
+
+	maid:Give(handle.InputBegan:Connect(function(input)
+		if dragging then return end
+		if
+			input.UserInputType == Enum.UserInputType.MouseButton1
+			or input.UserInputType == Enum.UserInputType.Touch
+		then
+			dragging = true
+			activeInput = input
+			moved = false
+			dragStart = Vector2.new(input.Position.X, input.Position.Y)
+			startPosition = frame.Position
+
+			if options.OnStart then
+				SafeCallback(options.OnStart)
+			end
+		end
+	end))
+
+	maid:Give(UserInputService.InputChanged:Connect(function(input)
+		if not dragging then
+			return
+		end
+
+		if
+			(activeInput.UserInputType == Enum.UserInputType.MouseButton1 and input.UserInputType == Enum.UserInputType.MouseMovement)
+			or input == activeInput
+		then
+			UpdatePosition(input.Position)
+		end
+	end))
+
+	maid:Give(UserInputService.InputEnded:Connect(function(input)
+		if not dragging then
+			return
+		end
+
+		if input == activeInput or (activeInput.UserInputType == Enum.UserInputType.MouseButton1
+			and input.UserInputType == Enum.UserInputType.MouseButton1)
+		then
+			dragging = false
+			activeInput = nil
+
+			if options.OnEnd then
+				SafeCallback(options.OnEnd, moved)
+			end
+		end
+	end))
+
+	return {
+		WasDragged = function()
+			return moved
+		end,
+	}
+end
+
+local function BindSlide(trigger, maid, onUpdate)
+	local sliding = false
+
+	maid:Give(trigger.InputBegan:Connect(function(input)
+		if
+			input.UserInputType == Enum.UserInputType.MouseButton1
+			or input.UserInputType == Enum.UserInputType.Touch
+		then
+			sliding = true
+			onUpdate(InputToGui(input.Position))
+		end
+	end))
+
+	maid:Give(UserInputService.InputChanged:Connect(function(input)
+		if not sliding then
+			return
+		end
+
+		if
+			input.UserInputType == Enum.UserInputType.MouseMovement
+			or input.UserInputType == Enum.UserInputType.Touch
+		then
+			onUpdate(InputToGui(input.Position))
+		end
+	end))
+
+	maid:Give(UserInputService.InputEnded:Connect(function(input)
+		if
+			input.UserInputType == Enum.UserInputType.MouseButton1
+			or input.UserInputType == Enum.UserInputType.Touch
+		then
+			sliding = false
+		end
+	end))
+end
+--==================================================
+-- LIBRARY OBJECT + ROOT GUI
+--==================================================
+
+local Library = {}
+
+local executionId = tostring(os.clock())
+pcall(function()
+	executionId = HttpService:GenerateGUID(false)
+end)
+
+Library.Name          = LIB_NAME
+Library.Version       = LIB_VERSION
+Library.ExecutionId   = executionId
+Library.Options       = {}
+Library.Flags         = {}
+Library.Settings      = Settings
+Library.Themes        = Themes
+Library.Windows       = {}
+Library.Notifications = {}
+Library.Dialogs       = {}
+Library.Unloaded      = false
+Library.Unloading     = false
+Library.UnloadCallbacks = {}
+
+function Library:GetIcons(includeAliases)
+	local names, seen = {}, {}
+	for alias, canonical in pairs(ICONS) do
+		local name = includeAliases and alias or canonical
+		if not seen[name] then seen[name] = true; table.insert(names, name) end
+	end
+	table.sort(names)
+	return names
+end
+
+function Library:ResolveIcon(icon, title)
+	return ResolveTabIcon(icon, title)
+end
+
+local LibraryMaid = Maid.new()
+
+local ScreenGui = nil
+local NotificationHolder = nil
+
+local FloatingButton = nil
+local FloatingLabel = nil
+local FloatingMoved = false
+
+local function DestroyStrayGuis(container)
+	if not container then
+		return
+	end
+
+	local ok, children = pcall(function()
+		return container:GetChildren()
+	end)
+
+	if not ok or typeof(children) ~= "table" then
+		return
+	end
+
+	for _, child in ipairs(children) do
+		local isTarget = false
+
+		pcall(function()
+			isTarget = child:IsA("ScreenGui") and child.Name == GUI_NAME
+		end)
+
+		if isTarget then
+			pcall(function()
+				child:Destroy()
+			end)
+		end
+	end
+end
+
+local function GetSharedEnvironments()
+	local environments = {}
+
+	if typeof(getgenv) == "function" then
+		local ok, env = pcall(getgenv)
+
+		if ok and typeof(env) == "table" then
+			table.insert(environments, env)
+		end
+	end
+
+	if typeof(_G) == "table" then
+		table.insert(environments, _G)
+	end
+
+	if typeof(shared) == "table" then
+		table.insert(environments, shared)
+	end
+
+	return environments
+end
+
+local function CleanupPreviousInstances()
+	for _, env in ipairs(GetSharedEnvironments()) do
+		local previous = rawget(env, "NUTHERAFROX_UI_LIBRARY")
+
+		if
+			typeof(previous) == "table"
+			and previous ~= Library
+			and typeof(previous.Destroy) == "function"
+		then
+			pcall(function()
+				previous:Destroy("reexecute")
+			end)
+		end
+
+		if rawget(env, "NUTHERAFROX_UI_LIBRARY") ~= Library then
+			rawset(env, "NUTHERAFROX_UI_LIBRARY", nil)
+		end
+	end
+
+	local containers = {}
+
+	if typeof(gethui) == "function" then
+		local ok, hui = pcall(gethui)
+		if ok and hui then
+			table.insert(containers, hui)
+		end
+	end
+
+	table.insert(containers, CoreGui)
+
+	if LocalPlayer then
+		local playerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+		if playerGui then
+			table.insert(containers, playerGui)
+		end
+	end
+
+	for _, container in ipairs(containers) do
+		DestroyStrayGuis(container)
+	end
+end
+
+local function GetGuiParent()
+	if typeof(gethui) == "function" then
+		local ok, hui = pcall(gethui)
+		if ok and hui then
+			return hui
+		end
+	end
+
+	local ok = pcall(function()
+		return CoreGui.Name
+	end)
+
+	if ok then
+		return CoreGui
+	end
+
+	if LocalPlayer then
+		return LocalPlayer:FindFirstChildOfClass("PlayerGui")
+	end
+
+	return nil
+end
+
+local function GetViewport()
+	if ScreenGui then
+		local ok, size = pcall(function()
+			return ScreenGui.AbsoluteSize
+		end)
+
+		if ok and size and size.X > 0 then
+			return size
+		end
+	end
+
+	local camera = workspace.CurrentCamera
+
+	if camera then
+		return camera.ViewportSize
+	end
+
+	return Vector2.new(1280, 720)
+end
+
+local function GetRootOffset()
+	if ScreenGui then
+		local ok, position = pcall(function()
+			return ScreenGui.AbsolutePosition
+		end)
+
+		if ok and position then
+			return position
+		end
+	end
+
+	return Vector2.new(0, 0)
+end
+
+local function ApplyRootOffset()
+	local offset = GetRootOffset()
+
+	if NotificationHolder and NotificationHolder.Parent then
+		NotificationHolder.Position = UDim2.new(1, -14, 0, 14 - offset.Y)
+	end
+
+	if FloatingButton and FloatingButton.Parent and not FloatingMoved then
+		FloatingButton.Position = UDim2.fromOffset(
+			18 - offset.X,
+			math.floor(GetViewport().Y * 0.35 - offset.Y)
+		)
+	end
+
+	local window = Library.Window
+
+	if window and not window.Destroyed and not window.PositionCustomised then
+		local viewport = GetViewport()
+		local size = window.Instance.AbsoluteSize
+
+		if size.X > 0 then
+			window.DefaultPosition = UDim2.fromOffset(
+				math.floor((viewport.X - size.X) / 2 - offset.X),
+				math.floor((viewport.Y - size.Y) / 2 - offset.Y)
+			)
+
+			window.Instance.Position = window.DefaultPosition
+		end
+	end
+end
+
+local EnsureRoot
+
+local function BuildNotificationHolder()
+	local viewport = GetViewport()
+	local width = math.min(300, math.max(200, viewport.X * 0.7))
+	local offset = GetRootOffset()
+
+	NotificationHolder = New("Frame", {
+		Name = "NUTHERAFROXNotifications",
+		Parent = ScreenGui,
+		BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, -14, 0, 14 - offset.Y),
+		Size = UDim2.new(0, width, 1, -28),
+		ZIndex = 500,
+	})
+
+	New("UIListLayout", {
+		Parent = NotificationHolder,
+		FillDirection = Enum.FillDirection.Vertical,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, 8),
+		HorizontalAlignment = Enum.HorizontalAlignment.Right,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+	})
+
+	LibraryMaid:Give(ScreenGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+		if NotificationHolder and NotificationHolder.Parent then
+			local size = GetViewport()
+			local newOffset = GetRootOffset()
+
+			NotificationHolder.Size =
+				UDim2.new(0, math.min(300, math.max(200, size.X * 0.7)), 1, -28)
+			NotificationHolder.Position = UDim2.new(1, -14, 0, 14 - newOffset.Y)
+		end
+	end))
+end
+
+EnsureRoot = function()
+	if ScreenGui and ScreenGui.Parent then
+		return ScreenGui
+	end
+
+	ScreenGui = New("ScreenGui", {
+		Name = GUI_NAME,
+		ResetOnSpawn = false,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		IgnoreGuiInset = true,
+		DisplayOrder = 999999,
+		AutoLocalize = false,
+	})
+
+	if typeof(syn) == "table" and typeof(syn.protect_gui) == "function" then
+		pcall(syn.protect_gui, ScreenGui)
+	end
+
+	if typeof(protect_gui) == "function" then
+		pcall(protect_gui, ScreenGui)
+	end
+
+	local parent = GetGuiParent()
+
+	if parent then
+		local ok = pcall(function()
+			ScreenGui.Parent = parent
+		end)
+
+		if not ok and LocalPlayer then
+			pcall(function()
+				ScreenGui.Parent = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+			end)
+		end
+	elseif LocalPlayer then
+		pcall(function()
+			ScreenGui.Parent = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+		end)
+	end
+
+	LibraryMaid:Give(ScreenGui)
+
+	BuildNotificationHolder()
+
+	task.defer(ApplyRootOffset)
+
+	return ScreenGui
+end
+
+Library.GetRoot = function()
+	return EnsureRoot()
+end
+
+--==================================================
+-- NOTIFICATION SYSTEM
+--==================================================
+
+local NotificationOrder = 0
+
+local NOTIFICATION_VARIANTS = {
+	default = { Icon = "info" },
+	info = { Icon = "info", Color = Color3.fromRGB(88, 145, 255) },
+	success = { Icon = "success", Color = Color3.fromRGB(62, 190, 116) },
+	warning = { Icon = "warning", Color = Color3.fromRGB(235, 170, 58) },
+	error = { Icon = "error", Color = Color3.fromRGB(226, 79, 79) },
+}
+
+function Library:Notify(options)
+	if typeof(options) == "string" then
+		options = { Title = "NUTHERAFROX", Content = options }
+	end
+
+	options = options or {}
+
+	local variantName = tostring(options.Type or options.Variant or "default"):lower()
+	local variant = NOTIFICATION_VARIANTS[variantName] or NOTIFICATION_VARIANTS.default
+	local customColor = typeof(options.Color) == "Color3" and options.Color or nil
+	local variantColor = customColor or variant.Color or T("Accent")
+	local usesThemeAccent = customColor == nil and variant.Color == nil
+
+	EnsureRoot()
+
+	local duration = tonumber(options.Duration) or 5
+	NotificationOrder = NotificationOrder + 1
+
+	local maid = Maid.new()
+	local notification = { Maid = maid, Closed = false, Type = variantName }
+
+	local holder = New("Frame", {
+		Name = "Notification",
+		Parent = NotificationHolder,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = NotificationOrder,
+		ClipsDescendants = false,
+		ZIndex = 501,
+	})
+
+	local frame = New("Frame", {
+		Name = "Body",
+		Parent = holder,
+		BackgroundColor3 = T("Element"),
+		BorderSizePixel = 0,
+		Position = UDim2.new(1.4, 0, 0, 0),
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		ZIndex = 502,
+	})
+
+	Corner(frame, 10)
+	Stroke(frame, "Border")
+	RegisterTheme(frame, { BackgroundColor3 = "Element" })
+
+	New("UIPadding", { Parent = frame, PaddingBottom = UDim.new(0, 12) })
+
+	local accentBar = New("Frame", {
+		Name = "Accent",
+		Parent = frame,
+		BackgroundColor3 = variantColor,
+		BorderSizePixel = 0,
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.new(0, 0, 0.5, 0),
+		Size = UDim2.fromOffset(3, 26),
+		ZIndex = 503,
+	})
+
+	Corner(accentBar, 2)
+	if usesThemeAccent then
+		RegisterTheme(accentBar, { BackgroundColor3 = "Accent" })
+	end
+
+	local iconBadge = New("Frame", {
+		Name = "VariantIcon",
+		Parent = frame,
+		BackgroundColor3 = variantColor,
+		BackgroundTransparency = 0.82,
+		BorderSizePixel = 0,
+		Position = UDim2.fromOffset(12, 12),
+		Size = UDim2.fromOffset(24, 24),
+		ZIndex = 503,
+	})
+	Corner(iconBadge, 7)
+
+	local variantGlyph, variantGlyphParts = CreateLineGlyph(iconBadge, variant.Icon, 14, 504)
+	variantGlyph.AnchorPoint = Vector2.new(0.5, 0.5)
+	variantGlyph.Position = UDim2.fromScale(0.5, 0.5)
+	SetGlyphColor(variantGlyphParts, variantColor)
+
+	if usesThemeAccent then
+		RegisterTheme(iconBadge, { BackgroundColor3 = "Accent" })
+		RegisterGlyphTheme(variantGlyphParts, "Accent")
+	end
+
+	local content = New("Frame", {
+		Name = "Content",
+		Parent = frame,
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(44, 12),
+		Size = UDim2.new(1, -72, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		ZIndex = 502,
+	})
+
+	ListLayout(content, 4)
+
+	local titleLabel = New("TextLabel", {
+		Name = "Title",
+		Parent = content,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, -20, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Font = FONT_BOLD,
+		Text = tostring(options.Title or "NUTHERAFROX"),
+		TextColor3 = T("Text"),
+		TextSize = 15,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextWrapped = true,
+		RichText = true,
+		LayoutOrder = 1,
+		ZIndex = 503,
+	})
+
+	RegisterTheme(titleLabel, { TextColor3 = "Text" })
+
+	local contentLabel = New("TextLabel", {
+		Name = "Body",
+		Parent = content,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Font = FONT,
+		Text = tostring(options.Content or ""),
+		TextColor3 = T("SubText"),
+		TextSize = 13,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextWrapped = true,
+		RichText = true,
+		LayoutOrder = 2,
+		Visible = options.Content ~= nil and tostring(options.Content) ~= "",
+		ZIndex = 503,
+	})
+
+	RegisterTheme(contentLabel, { TextColor3 = "SubText" })
+
+	local subLabel = New("TextLabel", {
+		Name = "SubContent",
+		Parent = content,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Font = FONT,
+		Text = tostring(options.SubContent or ""),
+		TextColor3 = T("SubText"),
+		TextSize = 12,
+		TextTransparency = 0.25,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextWrapped = true,
+		RichText = true,
+		LayoutOrder = 3,
+		Visible = options.SubContent ~= nil and tostring(options.SubContent) ~= "",
+		ZIndex = 503,
+	})
+
+	RegisterTheme(subLabel, { TextColor3 = "SubText" })
+
+	local closeButton = New("TextButton", {
+		Name = "Close",
+		Parent = frame,
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, -10, 0, 10),
+		Size = UDim2.fromOffset(24, 24),
+		BackgroundColor3 = T("ElementHover"),
+		BackgroundTransparency = 0.55,
+		BorderSizePixel = 0,
+		AutoButtonColor = false,
+		Text = "",
+		ZIndex = 504,
+	})
+
+	Corner(closeButton, 7)
+	RegisterTheme(closeButton, { BackgroundColor3 = "ElementHover" })
+	local closeGlyph, closeGlyphParts = CreateLineGlyph(closeButton, "close", 12, 505)
+	closeGlyph.AnchorPoint = Vector2.new(0.5, 0.5)
+	closeGlyph.Position = UDim2.fromScale(0.5, 0.5)
+	RegisterGlyphTheme(closeGlyphParts, "SubText")
+
+	function notification:Close()
+		if self.Closed then
+			return
+		end
+
+		self.Closed = true
+
+		if holder.Parent then
+			holder.Size = UDim2.new(1, 0, 0, holder.AbsoluteSize.Y)
+			holder.AutomaticSize = Enum.AutomaticSize.None
+		end
+
+		for index, entry in ipairs(Library.Notifications) do
+			if entry == self then
+				table.remove(Library.Notifications, index)
+				break
+			end
+		end
+
+		Tween(frame, { Position = UDim2.new(1.4, 0, 0, 0) }, SPEED.Normal, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+		Tween(holder, { Size = UDim2.new(1, 0, 0, 0) }, SPEED.Normal)
+
+		task.delay(Settings.Animations and (SPEED.Normal + 0.05) or 0, function()
+			maid:DoCleaning()
+
+			if holder and holder.Parent then
+				holder:Destroy()
+			end
+		end)
+	end
+
+	function notification:SetTitle(text)
+		titleLabel.Text = tostring(text or "")
+	end
+
+	function notification:SetContent(text)
+		contentLabel.Text = tostring(text or "")
+		contentLabel.Visible = tostring(text or "") ~= ""
+	end
+
+	function notification:SetSubContent(text)
+		subLabel.Text = tostring(text or "")
+		subLabel.Visible = tostring(text or "") ~= ""
+	end
+
+	notification.Destroy = notification.Close
+
+	maid:Give(closeButton.MouseButton1Click:Connect(function()
+		notification:Close()
+	end))
+
+	maid:Give(closeButton.MouseEnter:Connect(function()
+		Tween(closeButton, { BackgroundTransparency = 0.15 }, SPEED.Fast)
+		SetGlyphColor(closeGlyphParts, T("Text"))
+	end))
+
+	maid:Give(closeButton.MouseLeave:Connect(function()
+		Tween(closeButton, { BackgroundTransparency = 0.55 }, SPEED.Fast)
+		SetGlyphColor(closeGlyphParts, T("SubText"))
+	end))
+
+	maid:Give(holder)
+
+	table.insert(Library.Notifications, notification)
+
+	frame.Position = UDim2.new(1.4, 0, 0, 0)
+	Tween(frame, { Position = UDim2.new(0, 0, 0, 0) }, SPEED.Normal, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+
+	if duration > 0 then
+		task.delay(duration, function()
+			notification:Close()
+		end)
+	end
+
+	return notification
+end
+
+function Library:ClearNotifications()
+	for index = #Library.Notifications, 1, -1 do
+		local notification = Library.Notifications[index]
+		pcall(function()
+			notification:Close()
+		end)
+	end
+end
+
+--==================================================
+-- DIALOG SYSTEM
+--==================================================
+
+function Library:Dialog(options)
+	options = options or {}
+
+	EnsureRoot()
+
+	local maid = Maid.new()
+	local dialog = { Maid = maid, Closed = false }
+	local dialogOffset = GetRootOffset()
+
+	local blocker = New("TextButton", {
+		Name = "NUTHERAFROXDialog",
+		Parent = ScreenGui,
+		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Position = UDim2.fromOffset(-dialogOffset.X, -dialogOffset.Y),
+		Size = UDim2.fromScale(1, 1),
+		AutoButtonColor = false,
+		Text = "",
+		Modal = true,
+		ZIndex = 900,
+	})
+
+	local viewport = GetViewport()
+	local width = math.min(360, viewport.X - 40)
+
+	local panel = New("Frame", {
+		Name = "Panel",
+		Parent = blocker,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.new(0, width, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundColor3 = T("Background"),
+		BorderSizePixel = 0,
+		ZIndex = 901,
+	})
+
+	Corner(panel, 12)
+	Stroke(panel, "Border")
+	RegisterTheme(panel, { BackgroundColor3 = "Background" })
+	Padding(panel, 16, 16, 16, 16)
+	ListLayout(panel, 10)
+
+	local scale = New("UIScale", { Parent = panel, Scale = Settings.Animations and 0.92 or 1 })
+
+	local titleLabel = New("TextLabel", {
+		Name = "Title",
+		Parent = panel,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Font = FONT_BOLD,
+		Text = tostring(options.Title or "Dialog"),
+		TextColor3 = T("Text"),
+		TextSize = 18,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextWrapped = true,
+		RichText = true,
+		LayoutOrder = 1,
+		ZIndex = 902,
+	})
+
+	RegisterTheme(titleLabel, { TextColor3 = "Text" })
+
+	local contentLabel = New("TextLabel", {
+		Name = "Content",
+		Parent = panel,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Font = FONT,
+		Text = tostring(options.Content or ""),
+		TextColor3 = T("SubText"),
+		TextSize = 14,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextWrapped = true,
+		RichText = true,
+		LayoutOrder = 2,
+		ZIndex = 902,
+	})
+
+	RegisterTheme(contentLabel, { TextColor3 = "SubText" })
+
+	local buttonRow = New("Frame", {
+		Name = "Buttons",
+		Parent = panel,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 42),
+		LayoutOrder = 3,
+		ZIndex = 902,
+	})
+
+	New("UIListLayout", {
+		Parent = buttonRow,
+		FillDirection = Enum.FillDirection.Horizontal,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, 8),
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+	})
+
+	function dialog:Close()
+		if self.Closed then
+			return
+		end
+
+		self.Closed = true
+
+		for index, entry in ipairs(Library.Dialogs) do
+			if entry == self then
+				table.remove(Library.Dialogs, index)
+				break
+			end
+		end
+
+		Tween(blocker, { BackgroundTransparency = 1 }, SPEED.Fast)
+		Tween(scale, { Scale = 0.92 }, SPEED.Fast)
+
+		task.delay(Settings.Animations and (SPEED.Fast + 0.05) or 0, function()
+			maid:DoCleaning()
+		end)
+	end
+
+	dialog.Destroy = dialog.Close
+
+	local buttons = options.Buttons or {}
+	local count = math.max(#buttons, 1)
+
+	if #buttons == 0 then
+		buttons = { { Title = "OK" } }
+	end
+
+	for index, config in ipairs(buttons) do
+		local button = New("TextButton", {
+			Name = "DialogButton",
+			Parent = buttonRow,
+			BackgroundColor3 = index == 1 and T("Accent") or T("Element"),
+			BorderSizePixel = 0,
+			AutoButtonColor = false,
+			Size = UDim2.new(1 / count, -8 + (8 / count), 1, 0),
+			Font = FONT_MEDIUM,
+			Text = tostring(config.Title or "OK"),
+			TextColor3 = index == 1 and T("Background") or T("Text"),
+			TextSize = 14,
+			LayoutOrder = index,
+			ZIndex = 903,
+		})
+
+		Corner(button, 8)
+		Stroke(button, "Border")
+
+		if index == 1 then
+			RegisterTheme(button, { BackgroundColor3 = "Accent", TextColor3 = "Background" })
+		else
+			RegisterTheme(button, { BackgroundColor3 = "Element", TextColor3 = "Text" })
+		end
+
+		maid:Give(button.MouseButton1Click:Connect(function()
+			dialog:Close()
+			SafeCallback(config.Callback)
+		end))
+
+		maid:Give(button.MouseEnter:Connect(function()
+			Tween(button, {
+				BackgroundColor3 = index == 1 and T("Text") or T("ElementHover"),
+			}, SPEED.Fast)
+		end))
+
+		maid:Give(button.MouseLeave:Connect(function()
+			Tween(button, {
+				BackgroundColor3 = index == 1 and T("Accent") or T("Element"),
+				BackgroundTransparency = 0,
+			}, SPEED.Fast)
+		end))
+
+		maid:Give(button.MouseButton1Down:Connect(function()
+			Tween(button, { BackgroundTransparency = .15 }, SPEED.Fast)
+		end))
+
+		maid:Give(button.MouseButton1Up:Connect(function()
+			Tween(button, { BackgroundTransparency = 0 }, SPEED.Fast)
+		end))
+	end
+
+	maid:Give(blocker)
+
+	table.insert(Library.Dialogs, dialog)
+
+	Tween(blocker, { BackgroundTransparency = 0.45 }, SPEED.Normal)
+	Tween(scale, { Scale = 1 }, SPEED.Normal, Enum.EasingStyle.Back)
+
+	return dialog
+end
+
+--==================================================
+-- OPTION REGISTRY
+--==================================================
+
+local function RegisterOption(id, option)
+	if typeof(id) ~= "string" or id == "" then
+		return option
+	end
+
+	if Library.Options[id] and Library.Options[id] ~= option then
+		local suffix = 2
+		local newId = id .. "_" .. suffix
+
+		while Library.Options[newId] do
+			suffix = suffix + 1
+			newId = id .. "_" .. suffix
+		end
+
+		warn(("[NUTHERAFROX] Duplicate option id '%s' registered as '%s'"):format(id, newId))
+		id = newId
+	end
+
+	option.Id = id
+	Library.Options[id] = option
+	Library.Flags[id] = option
+
+	local configManager = Library.Config
+
+	if id:sub(1, 4) ~= "__NF"
+		and option.Save ~= false
+		and configManager
+		and typeof(configManager.QueueAutoLoad) == "function"
+	then
+		configManager:QueueAutoLoad()
+	end
+
+	return option
+end
+
+local function UnregisterOption(option)
+	if not option or not option.Id then
+		return
+	end
+
+	if Library.Options[option.Id] == option then
+		Library.Options[option.Id] = nil
+		Library.Flags[option.Id] = nil
+	end
+end
+
+--==================================================
+-- CONFIGURATION SYSTEM
+--==================================================
+
+local function EncodeValue(value)
+	local valueType = typeof(value)
+
+	if value == nil then
+		return { __nf = "Nil" }
+	elseif valueType == "Color3" then
+		return {
+			__nf = "Color3",
+			R = math.floor(value.R * 255 + 0.5),
+			G = math.floor(value.G * 255 + 0.5),
+			B = math.floor(value.B * 255 + 0.5),
+		}
+	elseif valueType == "EnumItem" then
+		return {
+			__nf = "EnumItem",
+			Enum = tostring(value.EnumType),
+			Name = value.Name,
+		}
+	elseif valueType == "UDim2" then
+		return {
+			__nf = "UDim2",
+			XS = value.X.Scale,
+			XO = value.X.Offset,
+			YS = value.Y.Scale,
+			YO = value.Y.Offset,
+		}
+	elseif valueType == "Vector2" then
+		return { __nf = "Vector2", X = value.X, Y = value.Y }
+	elseif valueType == "table" then
+		local output = {}
+
+		for key, entry in pairs(value) do
+			output[tostring(key)] = EncodeValue(entry)
+		end
+
+		return output
+	end
+
+	return value
+end
+
+local function DecodeValue(value)
+	if typeof(value) ~= "table" then
+		return value
+	end
+
+	local marker = rawget(value, "__nf")
+
+	if marker == "Nil" then
+		return nil
+	elseif marker == "Color3" then
+		return Color3.fromRGB(
+			tonumber(value.R) or 255,
+			tonumber(value.G) or 255,
+			tonumber(value.B) or 255
+		)
+	elseif marker == "EnumItem" then
+		if value.Enum == "KeyCode" or value.Enum == "Enum.KeyCode" then
+			local ok, key = pcall(function()
+				return Enum.KeyCode[value.Name]
+			end)
+			if ok and key then
+				return key
+			end
+		end
+
+		local ok, item = pcall(function()
+			local enumName = tostring(value.Enum):gsub("^Enum%.", "")
+			return Enum[enumName][value.Name]
+		end)
+
+		if ok and item then
+			return item
+		end
+
+		return nil
+	elseif marker == "UDim2" then
+		return UDim2.new(
+			tonumber(value.XS) or 0,
+			tonumber(value.XO) or 0,
+			tonumber(value.YS) or 0,
+			tonumber(value.YO) or 0
+		)
+	elseif marker == "Vector2" then
+		return Vector2.new(tonumber(value.X) or 0, tonumber(value.Y) or 0)
+	end
+
+	local output = {}
+
+	for key, entry in pairs(value) do
+		output[key] = DecodeValue(entry)
+	end
+
+	return output
+end
+
+local function IsConfigValueSerializable(value, visited)
+	local valueType = typeof(value)
+
+	if value == nil
+		or valueType == "boolean"
+		or valueType == "string"
+		or valueType == "Color3"
+		or valueType == "EnumItem"
+		or valueType == "UDim2"
+		or valueType == "Vector2"
+	then
+		return true
+	end
+
+	if valueType == "number" then
+		return value == value and value ~= math.huge and value ~= -math.huge
+	end
+
+	if valueType ~= "table" then
+		return false
+	end
+
+	visited = visited or {}
+
+	if visited[value] then
+		return false
+	end
+
+	visited[value] = true
+
+	for key, entry in pairs(value) do
+		local keyType = typeof(key)
+
+		if keyType ~= "string" and keyType ~= "number" and keyType ~= "boolean" then
+			visited[value] = nil
+			return false
+		end
+
+		if not IsConfigValueSerializable(entry, visited) then
+			visited[value] = nil
+			return false
+		end
+	end
+
+	visited[value] = nil
+	return true
+end
+
+local InterfaceListeners = {}
+local Config = nil
+
+local function OnInterfaceChanged(listener)
+	table.insert(InterfaceListeners, listener)
+end
+
+local function FireInterfaceChanged()
+	for _, listener in ipairs(InterfaceListeners) do
+		SafeCallback(listener, Settings)
+	end
+end
+
+local function SaveInterface()
+	if Library.Unloading then
+		return false, "library unloading"
+	end
+
+	if Config and Config.Loading then
+		return false, "load in progress"
+	end
+
+	if not FS.Available() then
+		return false
+	end
+
+	FS.EnsureFolder(ROOT_FOLDER)
+
+	local data = {
+		Theme        = Settings.Theme,
+		CustomAccent = Settings.CustomAccent and EncodeValue(Settings.CustomAccent) or nil,
+		Scale        = Settings.Scale,
+		Transparency = Settings.Transparency,
+		Animations   = Settings.Animations,
+		MinimizeKey  = typeof(Settings.MinimizeKey) == "EnumItem" and Settings.MinimizeKey.Name or nil,
+		Position     = Settings.Position and EncodeValue(Settings.Position) or nil,
+		AutoLoad     = Settings.AutoLoad,
+		ConfigName   = Settings.ConfigName,
+	}
+
+	local ok, encoded = pcall(function()
+		return HttpService:JSONEncode(data)
+	end)
+
+	if not ok then
+		return false
+	end
+
+	return FS.Write(INTERFACE_FILE, encoded)
+end
+
+local function ReadInterface()
+	local raw = FS.Read(INTERFACE_FILE)
+
+	if not raw then
+		return nil
+	end
+
+	local ok, data = pcall(function()
+		return HttpService:JSONDecode(raw)
+	end)
+
+	if ok and typeof(data) == "table" then
+		return data
+	end
+
+	return nil
+end
+
+local WINDOWS_RESERVED_NAMES = {
+	CON = true, PRN = true, AUX = true, NUL = true,
+	COM1 = true, COM2 = true, COM3 = true, COM4 = true, COM5 = true,
+	COM6 = true, COM7 = true, COM8 = true, COM9 = true,
+	LPT1 = true, LPT2 = true, LPT3 = true, LPT4 = true, LPT5 = true,
+	LPT6 = true, LPT7 = true, LPT8 = true, LPT9 = true,
+}
+
+local function NormalizeConfigName(name)
+	name = tostring(name or Settings.ConfigName or "default")
+	name = name:gsub("^%s+", ""):gsub("%s+$", "")
+	name = name:gsub("[<>:\"/\\|%?%*%c]", "_")
+	name = name:gsub("^%.*", ""):gsub("[%. ]+$", "")
+
+	if name == "" then
+		name = "default"
+	end
+
+	name = name:sub(1, 64)
+
+	if WINDOWS_RESERVED_NAMES[name:upper()] then
+		name = "_" .. name
+	end
+
+	return name
+end
+
+local function IsPersistableOption(id, option)
+	return typeof(id) == "string"
+		and id:sub(1, 4) ~= "__NF"
+		and typeof(option) == "table"
+		and option.Save ~= false
+		and typeof(option.SetValue) == "function"
+end
+
+Config = {
+	Loading = false,
+	LastLoadReport = nil,
+	LastSaveReport = nil,
+	AutoLoadDelay = 0.6,
+	AutoLoadScheduled = false,
+	AutoLoadAttempted = false,
+	AutoLoadLoaded = false,
+	_AutoLoadGeneration = 0,
+}
+Library.Config = Config
+Library.SaveManager = Config
+
+function Config:GetPath(name)
+	return CONFIG_FOLDER .. "/" .. NormalizeConfigName(name) .. ".json"
+end
+
+function Config:NormalizeName(name)
+	return NormalizeConfigName(name)
+end
+
+function Config:IsLoading()
+	return self.Loading == true
+end
+
+function Config:CancelPendingAutoLoad()
+	self._AutoLoadGeneration = (self._AutoLoadGeneration or 0) + 1
+	self.AutoLoadScheduled = false
+	return self
+end
+
+function Config:GetAutoLoadState()
+	return {
+		Name = Settings.AutoLoad,
+		Scheduled = self.AutoLoadScheduled == true,
+		Attempted = self.AutoLoadAttempted == true,
+		Loaded = self.AutoLoadLoaded == true,
+	}
+end
+
+function Config:QueueAutoLoad()
+	if Library.Unloading
+		or self.Loading
+		or self.AutoLoadAttempted
+		or not Settings.AutoLoad
+		or Settings.AutoLoad == ""
+	then
+		return false
+	end
+
+	self._AutoLoadGeneration = (self._AutoLoadGeneration or 0) + 1
+	local generation = self._AutoLoadGeneration
+	self.AutoLoadScheduled = true
+
+	task.delay(math.max(tonumber(self.AutoLoadDelay) or 0.6, 0), function()
+		if generation ~= self._AutoLoadGeneration
+			or self.AutoLoadAttempted
+			or not Settings.AutoLoad
+			or Settings.AutoLoad == ""
+		then
+			return
+		end
+
+		self.AutoLoadScheduled = false
+		self:LoadAutoLoad()
+	end)
+
+	return true
+end
+
+function Config:GetConfigs()
+	local configs = {}
+
+	for _, path in ipairs(FS.List(CONFIG_FOLDER)) do
+		local file = tostring(path)
+
+		if file:sub(-5) == ".json" then
+			local name = file:match("([^/\\]+)%.json$")
+
+			if name then
+				table.insert(configs, name)
+			end
+		end
+	end
+
+	table.sort(configs)
+
+	return configs
+end
+
+function Config:Save(name)
+	name = NormalizeConfigName(name)
+
+	if Library.Unloading then
+		return false, "library unloading"
+	end
+
+	if self.Loading then
+		return false, "load in progress"
+	end
+
+	if not FS.Available() then
+		Library:Notify({
+			Title = "Configuration",
+			Content = "This executor does not support file saving.",
+			Duration = 4,
+		})
+		return false, "no filesystem"
+	end
+
+	FS.EnsureFolder(ROOT_FOLDER)
+	FS.EnsureFolder(CONFIG_FOLDER)
+
+	local data = {
+		Schema = 2,
+		Version = LIB_VERSION,
+		SavedAt = os.time(),
+		Options = {},
+		Interface = {
+			Theme        = Settings.Theme,
+			Scale        = Settings.Scale,
+			Transparency = Settings.Transparency,
+			Animations   = Settings.Animations,
+			MinimizeKey  = typeof(Settings.MinimizeKey) == "EnumItem" and Settings.MinimizeKey.Name or nil,
+			Position     = Settings.Position and EncodeValue(Settings.Position) or nil,
+		},
+	}
+
+	local savedCount = 0
+	local skippedCount = 0
+
+	for id, option in pairs(Library.Options) do
+		if IsPersistableOption(id, option) and IsConfigValueSerializable(option.Value) then
+			local entry = {
+				Type = option.Type,
+				Value = EncodeValue(option.Value),
+			}
+
+			if option.Type == "Keybind" then
+				entry.Mode = option.Mode
+			end
+
+			if option.Type == "Colorpicker" then
+				entry.Transparency = option.Transparency
+			end
+
+			data.Options[id] = entry
+			savedCount = savedCount + 1
+		elseif option.Save ~= false and id:sub(1, 4) ~= "__NF" then
+			skippedCount = skippedCount + 1
+		end
+	end
+
+	self.LastSaveReport = {
+		Name = name,
+		Saved = savedCount,
+		Skipped = skippedCount,
+	}
+
+	local ok, encoded = pcall(function()
+		return HttpService:JSONEncode(data)
+	end)
+
+	if not ok then
+		warn("[NUTHERAFROX] Failed to encode configuration:", encoded)
+		return false, "encode failed"
+	end
+
+	local written = FS.Write(self:GetPath(name), encoded)
+
+	if written then
+		Settings.ConfigName = name
+		SaveInterface()
+	end
+
+	return written, self.LastSaveReport
+end
+
+function Config:Load(name, options)
+	if typeof(name) == "table" then
+		options = name
+		name = nil
+	end
+
+	name = NormalizeConfigName(name)
+	options = typeof(options) == "table" and options or {}
+
+	if Library.Unloading then
+		return false, "library unloading"
+	end
+
+	if self.Loading then
+		return false, "load in progress"
+	end
+
+	local raw = FS.Read(self:GetPath(name))
+
+	if not raw then
+		Library:Notify({
+			Title = "Configuration",
+			Content = ("Config '%s' was not found."):format(name),
+			Duration = 4,
+		})
+		return false, "not found"
+	end
+
+	local ok, data = pcall(function()
+		return HttpService:JSONDecode(raw)
+	end)
+
+	if not ok or typeof(data) ~= "table" then
+		warn("[NUTHERAFROX] Failed to decode configuration:", data)
+		return false, "decode failed"
+	end
+
+	local report = {
+		Name = name,
+		Restored = 0,
+		Skipped = 0,
+		Failed = 0,
+		Silent = options.Silent == true,
+	}
+
+	self.Loading = true
+	Library.ConfigLoading = true
+	local restoredOptions = {}
+
+	if typeof(data.Options) == "table" then
+		for id, entry in pairs(data.Options) do
+			local option = Library.Options[id]
+
+			if IsPersistableOption(id, option)
+				and typeof(entry) == "table"
+				and entry.Value ~= nil
+				and (entry.Type == nil or option.Type == entry.Type)
+			then
+				local value = DecodeValue(entry.Value)
+
+				local success, restoreError = pcall(function()
+					if option.Type == "Keybind" then
+						option:SetValue(value, entry.Mode, true)
+					elseif option.Type == "Colorpicker" then
+						if typeof(value) == "Color3" then
+							option:SetValueRGB(value, tonumber(entry.Transparency), true)
+						else
+							error("invalid Color3 value")
+						end
+					else
+						option:SetValue(value, true)
+					end
+				end)
+
+				if success then
+					report.Restored = report.Restored + 1
+					table.insert(restoredOptions, option)
+				else
+					report.Failed = report.Failed + 1
+					warn("[NUTHERAFROX] Failed to restore option:", id, restoreError)
+				end
+			else
+				report.Skipped = report.Skipped + 1
+			end
+		end
+	end
+
+	Settings.ConfigName = name
+
+	if options.LoadInterface ~= false and typeof(data.Interface) == "table" then
+		local interface = data.Interface
+
+		if interface.Theme then
+			SetThemeInternal(interface.Theme)
+		end
+
+		if tonumber(interface.Scale) then
+			Settings.Scale = Clamp(tonumber(interface.Scale), 0.5, 2)
+		end
+
+		if tonumber(interface.Transparency) then
+			Settings.Transparency = Clamp(tonumber(interface.Transparency), 0, 0.9)
+		end
+
+		if typeof(interface.Animations) == "boolean" then
+			Settings.Animations = interface.Animations
+		end
+
+		if interface.MinimizeKey then
+			local okKey, key = pcall(function()
+				return Enum.KeyCode[interface.MinimizeKey]
+			end)
+
+			if okKey and key then
+				Settings.MinimizeKey = key
+			end
+		end
+
+		if typeof(interface.Position) == "table" then
+			local position = DecodeValue(interface.Position)
+
+			if typeof(position) == "UDim2" then
+				Settings.Position = position
+			end
+		end
+
+		FireInterfaceChanged()
+	end
+
+	if not report.Silent then
+		for _, option in ipairs(restoredOptions) do
+			if option.Type == "Keybind" then
+				SafeCallback(option.ChangedCallback, option.Value)
+
+				for _, callback in ipairs(option._Changed or {}) do
+					SafeCallback(callback, option.Value)
+				end
+			elseif option.Type == "Colorpicker" then
+				option:_FireChanged(option.Value, option.Transparency)
+			else
+				option:_FireChanged(option.Value)
+			end
+		end
+	end
+
+	self.Loading = false
+	Library.ConfigLoading = false
+	self.LastLoadReport = report
+
+	return true, report
+end
+
+function Config:Delete(name)
+	name = NormalizeConfigName(name)
+
+	if Library.Unloading then
+		return false, "library unloading"
+	end
+
+	if self.Loading then
+		return false, "load in progress"
+	end
+
+	local path = self:GetPath(name)
+
+	if not FS.Exists(path) then
+		return false, "not found"
+	end
+
+	local deleted = FS.Delete(path)
+
+	if deleted and Settings.AutoLoad == name then
+		Settings.AutoLoad = nil
+		self:CancelPendingAutoLoad()
+		self.AutoLoadAttempted = false
+		self.AutoLoadLoaded = false
+		SaveInterface()
+	end
+
+	return deleted
+end
+
+function Config:SetAutoLoad(name)
+	if Library.Unloading then
+		return false, "library unloading"
+	end
+
+	if self.Loading then
+		return false, "load in progress"
+	end
+
+	self:CancelPendingAutoLoad()
+	self.AutoLoadAttempted = false
+	self.AutoLoadLoaded = false
+
+	if name == nil then
+		Settings.AutoLoad = nil
+	else
+		Settings.AutoLoad = NormalizeConfigName(name)
+	end
+
+	SaveInterface()
+
+	return Settings.AutoLoad
+end
+
+function Config:GetAutoLoad()
+	return Settings.AutoLoad
+end
+
+function Config:LoadAutoLoad(options)
+	self:CancelPendingAutoLoad()
+	self.AutoLoadAttempted = true
+	self.AutoLoadLoaded = false
+
+	if not Settings.AutoLoad or Settings.AutoLoad == "" then
+		return false, "not set"
+	end
+
+	local autoLoadName = Settings.AutoLoad
+	local loaded, result = self:Load(autoLoadName, options)
+	self.AutoLoadLoaded = loaded == true
+
+	if loaded then
+		Library:Notify({
+			Title = "Configuration",
+			Content = ("Auto loaded '%s'."):format(autoLoadName),
+			Duration = 3,
+		})
+	end
+
+	return loaded, result
+end
+--==================================================
 -- COMPONENT BASE
 --==================================================
 
